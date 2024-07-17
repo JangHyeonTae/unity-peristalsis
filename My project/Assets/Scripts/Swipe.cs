@@ -56,7 +56,8 @@ public class Swipe : MonoBehaviour
         {
             if (deltaY > 0) // Up swipe
             {
-                playerMovement.Jump();
+                float jumpForce = deltaY / minDistanceForSwipe;
+                playerMovement.Jump(jumpForce);
             }
         }
     }

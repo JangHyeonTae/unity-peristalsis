@@ -1851,11 +1851,11 @@ Transform:
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 7435382843680233486}
   - {fileID: 6674240327441011874}
+  - {fileID: 7435382843680233486}
   - {fileID: 1365788110372471966}
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!95 &7589951274401514093
 Animator:
@@ -1867,10 +1867,10 @@ Animator:
   m_GameObject: {fileID: 7378989274818663268}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 303d1b3d480355b46959341634191cf7, type: 3}
-  m_Controller: {fileID: 9100000, guid: f170282b0c2e61942a1922e0c78f47b7, type: 2}
+  m_Controller: {fileID: 9100000, guid: a79485dce85aa5d4ebe0fe8614ee145e, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
-  m_ApplyRootMotion: 0
+  m_ApplyRootMotion: 1
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_WarningMessage: 
@@ -1901,7 +1901,7 @@ CharacterController:
   m_Radius: 0.5
   m_SlopeLimit: 50.11
   m_StepOffset: 0.3
-  m_SkinWidth: 1
+  m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0.75, z: 0}
 --- !u!114 &8384462243533094812
@@ -1929,14 +1929,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 543d426ca14053a46b12f56404d91e9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
+  moveSpeed: 1
   playerVelocity: {x: 0, y: 0, z: 0}
-  gravityValue: -10
+  jumpHeight: 10
+  gravityValue: -30
   groundDistance: 0.2
+  player: {fileID: 0}
   joystick: {fileID: 0}
   charcon: {fileID: 1098709291749590539}
   target: {fileID: 1382632846296467865}
   camTrans: {fileID: 6674240327441011874}
+  jumpActive: 0
 --- !u!1 &7486056355767133477
 GameObject:
   m_ObjectHideFlags: 0

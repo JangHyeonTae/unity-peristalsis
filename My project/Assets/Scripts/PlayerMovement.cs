@@ -7,12 +7,14 @@ using UnityEditor;
 
 public class PlayerMovement : MonoBehaviour
 {
+    public float gravityModifier, jumpPower;
     [SerializeField] float moveSpeed = 1.0f;
-    [SerializeField] Vector3 playerVelocity;
-    [SerializeField] float gravityValue = -10f;
-    [SerializeField] float groundDistance = 0.2f;
-    [SerializeField] float jumpHeight = 10f;
-    public Vector3 MoveVector { set; get; }
+    //[SerializeField] Vector3 playerVelocity;
+    //[SerializeField] float gravityValue = -10f;
+    //[SerializeField] float groundDistance = 0.2f;
+    //[SerializeField] float jumpHeight = 10f;
+    public Vector3 MoveVector { get; set; }
+    public Vector3 dirMove;
 
     public VirtualJoystick joystick;
     public CharacterController charcon;
@@ -20,113 +22,115 @@ public class PlayerMovement : MonoBehaviour
     public Transform target;
     public Transform camTrans;
 
-    private bool isGrounded;
-    private LayerMask groundMask;
-    private Transform transGroundCheckPoint;
+   //private bool Grounded;
+    public LayerMask groundMask;
+    //private Transform transGroundCheckPoint;
+    public Transform groundCheckPoint; 
 
 
     Animator animator;
+    float animatorSpeed = 0f;
     private bool hasAnimator;
 
-    //private int _animIDSpeed;
-    //private int _animIDJump;
+    private bool canJump;
 
-    [SerializeField] float SpeedChageRate = 10f;
-
-    public bool jumpbool;
 
     void Start()
     {
         hasAnimator = TryGetComponent(out animator);
         charcon = gameObject.GetComponent<CharacterController>();
         animator = GetComponent<Animator>();    
-        transGroundCheckPoint = transform;
-        groundMask = (1 << 6 ) | (1 << 7);
-        if (hasAnimator)
+        //transGroundCheckPoint = transform;
+        //groundMask = (1 << 6 ) | (1 << 7);
+
+
+        if(hasAnimator)
         {
             animator.applyRootMotion = false;
         }
 
     }
 
-   //private void AssignAnimationIDs()
-   //{
-   //    _animIDSpeed = Animator.StringToHash("Speed");
-   //    _animIDJump = Animator.StringToHash("Jump");
-   //}
 
     void Update()
     {
-
         MovePad();
+        
+        //GroundedCheck();
 
-        GroundedCheck();
+        //Vector3 movement = MoveVector * moveSpeed *Time.deltaTime;
 
-        //if (isGrounded && playerVelocity.y < 0)
-        //{
-        //    playerVelocity.y = 0f;
-        //
-        //}
-        //else
-        //{
-        //    playerVelocity.y = gravityValue * Time.deltaTime;
-        //}
+        //playerVelocity.y = gravityValue * Time.deltaTime;
 
-        Vector3 movement = MoveVector * moveSpeed * Time.deltaTime;
-
-        charcon.Move(playerVelocity * Time.deltaTime + movement);
-
+        //charcon.Move(playerVelocity * Time.deltaTime + movement);
         
     }
 
-    void GroundedCheck()
-    {
-        isGrounded = Physics.Raycast(transGroundCheckPoint.position, Vector3.down, groundDistance, groundMask);
-        
-    }
+    //void GroundedCheck()
+    //{
+    //    Grounded = Physics.Raycast(transGroundCheckPoint.position, Vector3.down, groundDistance, groundMask);
+    //    if (Grounded && playerVelocity.y < 0)
+    //    {
+    //        playerVelocity.y = 0f;
+    //
+    //    }
+    //}
 
     public void MovePad()
     {
+        float ystore = MoveVector.y;
+
         Vector3 dir = Vector3.zero;
 
         dir.x = joystick.Horizontal();
         dir.z = joystick.Vertical();
 
 
-        Vector3 dirMove = transform.forward * dir.z + transform.right * dir.x;
-        
-        MoveVector = dirMove;
-        float animatorSpeed = MoveVector.magnitude;
+        dirMove = transform.forward * dir.z + transform.right * dir.x;
+        dirMove.Normalize();
 
-        if (dir != Vector3.zero)
+        dirMove.y += Physics.gravity.y * gravityModifier * Time.deltaTime;
+        dirMove.y = ystore;
+
+        if(charcon.isGrounded)
+        {
+            dirMove.y = Physics.gravity.y * gravityModifier * Time.deltaTime;
+        }
+
+        Jump(dirMove.y);
+
+        MoveVector = dirMove;
+        float animatorSpeed = MoveVector.x;
+
+        
+        Vector3 movement = MoveVector * moveSpeed;
+        charcon.Move(movement * Time.deltaTime);
+
+        if(dir != Vector3.zero)
         {
             transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y + dir.x, transform.rotation.eulerAngles.z);
         }
-
-
-        if (hasAnimator)
-        {
-            //animator.SetFloat(_animIDSpeed, animatorSpeed);
-            animator.SetFloat("Speed", animatorSpeed);
-        }
-    }
-    public void Jump()
-    {
-
-        playerVelocity.y = Mathf.Sqrt(jumpHeight * -2.0f* gravityValue);
-       
-
         
-        //if (isGrounded)
-        //{
-        //    playerVelocity.y = Mathf.Sqrt(jumpHeight * -2.0f * gravityValue);
-        //}   
-
-        if (hasAnimator)
+        if(hasAnimator)
         {
-            animator.SetTrigger("Jump");
+            animator.SetFloat("Speed", animatorSpeed);
+            //animator.SetFloat("MotionSpeed", 1f);
         }
+    }
+    public void Jump(float jumpForce)
+    {
+        canJump = Physics.OverlapSphere(groundCheckPoint.position, .25f, groundMask).Length > 0;
+        if (canJump)
+        {
+            dirMove.y = Mathf.Lerp(0, jumpForce, Time.deltaTime);
+            Debug.Log("jump");
+        }  
+
+
+       //if (hasAnimator)
+       //{
+       //    animator.SetTrigger("Jump");
+       //}
 
     }
-
 }
